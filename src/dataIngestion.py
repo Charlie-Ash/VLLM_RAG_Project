@@ -31,7 +31,11 @@ def build_PDF_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClie
     chunks = splitter.get_nodes_from_documents(documents=documents)  # All PDF file content's chunks
 
     # Embed chunks
-    embedding_model = HuggingFaceEmbedding(model_name= "nvidia/llama-embed-nemotron-8b")  # From nvidia, 8b embedding model
+    embedding_model = HuggingFaceEmbedding(
+        model_name= "nvidia/llama-embed-nemotron-8b",
+        trust_remote_code=True
+    )  # From nvidia, 8b embedding model
+    
     # Setup Qdrant
     db_client = qdrant_client.QdrantClient(path="./qdrant_db")  # DB client
 
