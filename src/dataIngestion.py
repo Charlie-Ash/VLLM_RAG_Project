@@ -4,13 +4,21 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.core import StorageContext
 import qdrant_client
+
+from pathlib import Path
 import typing
 
 def build_PDF_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]:
 
+    # Current file directory (src/)
+    CURRENT_DIR = Path(__file__).resolve().parent
+
+    # Move up one level, then enter data/
+    DATA_DIR = CURRENT_DIR.parent / "data"
+
     # Load documents
     reader = SimpleDirectoryReader(  # 和潤文件處理元件
-        input_dir="C:\\Users\\charl\\Code\\Python\\vLLMLearning\\data", # Path to the directory, where the contents within will be read
+        input_dir=str(DATA_DIR), # Path to the directory, where the contents within will be read
         recursive=True
     )
     documents = reader.load_data(show_progress=True)
