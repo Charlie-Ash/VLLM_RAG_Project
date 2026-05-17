@@ -67,5 +67,6 @@ if __name__ == "__main__":
 
     index, db_client = build_PDF_vector_index()
     print(db_client.get_collection(collection_name= "my_docs"))
+    db_client.close()  # To close the DB, hopehully to fix import error
 
 
