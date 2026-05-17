@@ -25,8 +25,8 @@ def build_PDF_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClie
 
     # Chunk documents
     splitter = SentenceSplitter(  # 和潤切片策略元件
-        chunk_size=512,
-        chunk_overlap=64
+        chunk_size=256,
+        chunk_overlap=32
     )
     chunks = splitter.get_nodes_from_documents(documents=documents)  # All PDF file content's chunks
 
@@ -62,7 +62,7 @@ def build_PDF_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClie
     return index, db_client
 
 
-# Test portal (Will remove if works smoothly)
+# Test portal 
 if __name__ == "__main__":
 
     index, db_client = build_PDF_vector_index()
