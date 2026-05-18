@@ -59,7 +59,7 @@ def build_PDF_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClie
     )
 
     # Return Index    
-    return index, db_client
+    return index, db_client  # REMEMBER TO DELETE: db_client's returning was only for dataIngestion.py's testing
 
 
 # Test portal 

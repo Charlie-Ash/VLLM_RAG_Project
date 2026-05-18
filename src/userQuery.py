@@ -1,10 +1,9 @@
 from dataIngestion import build_PDF_vector_index # del
 from llama_index.core import VectorStoreIndex
 import typing
-import qdrant_client
 
 
-def user_query(index: VectorStoreIndex, db_client: qdrant_client.QdrantClient, input_string: str) -> list[str]:
+def user_query(index: VectorStoreIndex, input_string: str) -> list[str]:
 
     # Retriever
     retriever = index.as_retriever(similarity_top_k= 3)  # Top 3 similar chunks to return
@@ -20,7 +19,7 @@ def user_query(index: VectorStoreIndex, db_client: qdrant_client.QdrantClient, i
     for node in results_node:
 
         # Test print
-        print(f"node {1} score:" + node.score)
+        print(f"node {i} score: {node.score}")
         print(node.text)
         i = i + 1
 
@@ -34,6 +33,6 @@ def user_query(index: VectorStoreIndex, db_client: qdrant_client.QdrantClient, i
 if __name__ == "__main__":
 
     index, db_client = build_PDF_vector_index()
-    results_text_list = user_query(index, db_client, "What was Pete's favorite subject when he was young?")
-    print("RESULTS:" + results_text_list)
+    results_text_list = user_query(index, "What was Pete's favorite subject when he was young?")
+    print(f"RESULTS: {results_text_list}")
 
