@@ -1,5 +1,12 @@
 from vllm import LLM, SamplingParams
+from userQuery import user_query
+from dataIngestion import build_vector_index
 
+
+# Vector index built here
+index, db_client = build_vector_index()
+
+# LLM
 llm = LLM(
     model="RedHatAI/gemma-4-26B-A4B-it-NVFP4",
     gpu_memory_utilization=0.9,  # reserve up to 90% of available VRAM for the KV cache and runtime buffers
@@ -15,17 +22,19 @@ sampling_params = SamplingParams(
 )   # top_p; nucleus sampling,
 
 # Structured prompt (fed to vllm.chat()), OpenAI format
+sys_prompt = "You are a research assitant. Please use the relavent infomation passed in from the role 'infomation' to answer the users question. If the answer is unclear, reply the fact that you don't know."
 prompts = [{
 
     "role": "system",
-    "content": "Hello, my name is Charlie. Can you introduce youself to me?"
+    "content": sys_prompt
 
-}, {"placeholder": "placeholder"}]
+}, {"placeholder": "placeholder"}, {"placeholder": "placeholder"}, {"placeholder": "placeholder"}, {"placeholder": "placeholder"}]
 
 # Main logic loop
 input_text = input(">>> ")
 while input_text.lower() != "bye":
 
+    # User's question prompt
     user_prompt = {
 
         "role": "user",
@@ -33,6 +42,19 @@ while input_text.lower() != "bye":
 
     }
     prompts[1] = user_prompt
+
+    # Retrieval relavent chunks
+    relavent_info_list = user_query(index, input_text)
+    for i in range(3):
+
+        info_prompt = {
+
+            "role": "infomation",
+            "content": relavent_info_list[i]
+
+        }
+        prompts[i + 2] = info_prompt
+
 
     # Feed structured prompt to LLM
     outputs = llm.chat(prompts, sampling_params)
