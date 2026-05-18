@@ -1,4 +1,4 @@
-from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
+from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, Document
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
@@ -6,9 +6,9 @@ from llama_index.core import StorageContext
 import qdrant_client
 
 from pathlib import Path
-import typing
 
-def build_PDF_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]:
+
+def build_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]:
 
     # Current file directory (src/)
     CURRENT_DIR = Path(__file__).resolve().parent
@@ -65,8 +65,8 @@ def build_PDF_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClie
 # Test portal 
 if __name__ == "__main__":
 
-    index, db_client = build_PDF_vector_index()
+    index, db_client = build_vector_index()
     print(db_client.get_collection(collection_name= "my_docs"))
-    db_client.close()  # To close the DB, hopehully to fix import error
+    db_client.close()  # To close the DB, fixing import error
 
 

@@ -1,4 +1,4 @@
-from dataIngestion import build_PDF_vector_index # del
+from dataIngestion import build_vector_index # del
 from llama_index.core import VectorStoreIndex
 import typing
 
@@ -32,7 +32,8 @@ def user_query(index: VectorStoreIndex, input_string: str) -> list[str]:
 # Test portal 
 if __name__ == "__main__":
 
-    index, db_client = build_PDF_vector_index()
+    index, db_client = build_vector_index()
     results_text_list = user_query(index, "What was Pete's favorite subject when he was young?")
     print(f"RESULTS: {results_text_list}")
+    db_client.close()  # To close the DB, fixing import error
 
