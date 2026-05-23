@@ -33,7 +33,7 @@ def user_query(index: VectorStoreIndex, input_string: str) -> list[str]:
 if __name__ == "__main__":
 
     index, db_client = build_vector_index()
-    results_text_list = user_query(index, "What was Pete's favorite subject when he was young?")
+    results_text_list = user_query(index, "What was Pete's favorite subject when he was young?")  # Testing question
     print(f"RESULTS: {results_text_list}")
     db_client.close()  # To close the DB, fixing import error
 
