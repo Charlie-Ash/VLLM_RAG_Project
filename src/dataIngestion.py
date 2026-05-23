@@ -50,8 +50,8 @@ def build_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]:
 
     # Chunk documents
     splitter = SentenceSplitter(  # 和潤切片策略元件
-        chunk_size=256,
-        chunk_overlap=32
+        chunk_size=128,
+        chunk_overlap=16
     )
     chunks = splitter.get_nodes_from_documents(documents=documents)  # All PDF file content's chunks
 
