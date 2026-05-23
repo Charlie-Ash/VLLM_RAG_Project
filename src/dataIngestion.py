@@ -4,11 +4,13 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.core import StorageContext
 import qdrant_client
+import pymupdf
 
 from pathlib import Path
 
+def load_documents() -> list[Document]:  # Probably add a path argument here in the future for better modification
 
-def build_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]:
+    documents = []
 
     # Current file directory (src/)
     CURRENT_DIR = Path(__file__).resolve().parent
@@ -16,12 +18,35 @@ def build_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]:
     # Move up one level, then enter data/
     DATA_DIR = CURRENT_DIR.parent / "data"
 
-    # Load documents
-    reader = SimpleDirectoryReader(  # 和潤文件處理元件
-        input_dir=str(DATA_DIR), # Path to the directory, where the contents within will be read
-        recursive=True
-    )
-    documents = reader.load_data(show_progress=True)
+    # Find all PDF files recursively
+    pdf_files = DATA_DIR.rglob("*.pdf")
+
+    for pdf_file in pdf_files:
+
+        print(f"Loading: {pdf_file.name}")
+        pdf = pymupdf.open(pdf_file)
+        full_text = ""
+
+        for page in pdf:
+            full_text += page.get_text()
+
+        pdf.close()
+
+        # Create LlamaIndex Document object
+        documents.append(
+
+            Document(text= full_text, metadata= {"file_name": pdf_file.name})
+
+        )
+
+    return documents
+
+
+
+def build_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]:
+
+    # Document loading
+    documents = load_documents()
 
     # Chunk documents
     splitter = SentenceSplitter(  # 和潤切片策略元件

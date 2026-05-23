@@ -2,3 +2,4 @@ llama-index
 llama-index-embeddings-huggingface
 qdrant-client
 llama-index-vector-stores-qdrant
+pymupdf
