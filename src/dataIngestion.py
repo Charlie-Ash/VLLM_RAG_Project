@@ -117,10 +117,17 @@ def load_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]: 
         vector_store= vector_store
     )
 
+    # Embedding model is stioll needed when loading existing DB. Still used in user query.
+    embedding_model = HuggingFaceEmbedding(
+        model_name= "nvidia/llama-embed-nemotron-8b",
+        trust_remote_code=True
+    )  # From nvidia, 8b embedding model
+
     # Persisting indexes
     index = VectorStoreIndex.from_vector_store(  # 和潤向量索引元件
         vector_store= vector_store,
-        storage_context= storage_context
+        storage_context= storage_context,
+        embed_model= embedding_model
     )
 
     # Return Index    
