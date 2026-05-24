@@ -130,6 +130,13 @@ def load_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]: 
         embed_model= embedding_model
     )
 
+    # Clean-up (Delete embedding model & empty CUDA cache)
+    del embedding_model
+    gc.collect()
+
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
     # Return Index    
     return index, db_client
 
