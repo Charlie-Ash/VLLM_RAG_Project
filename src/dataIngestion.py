@@ -68,7 +68,8 @@ def build_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]:
     # Embed chunks
     embedding_model = HuggingFaceEmbedding(
         model_name= "nvidia/llama-embed-nemotron-8b",
-        trust_remote_code=True
+        trust_remote_code=True,
+        device="cpu"  # Embedding to run on CPU since it interferes with LLM in the GPU (resource-wise)
     )  # From nvidia, 8b embedding model
     
     # Setup Qdrant
@@ -127,7 +128,8 @@ def load_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]: 
     index = VectorStoreIndex.from_vector_store(  # 和潤向量索引元件
         vector_store= vector_store,
         storage_context= storage_context,
-        embed_model= embedding_model
+        embed_model= embedding_model,
+        device="cpu"  # Embedding to run on CPU since it interferes with LLM in the GPU (resource-wise)
     )
 
     # Clean-up (Delete embedding model & empty CUDA cache)
