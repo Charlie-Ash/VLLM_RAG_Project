@@ -121,7 +121,7 @@ def load_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]: 
     # Embedding model is stioll needed when loading existing DB. Still used in user query.
     embedding_model = HuggingFaceEmbedding(
         model_name= "BAAI/bge-m3",
-        trust_remote_code=True
+        trust_remote_code=True,
         device="cpu"  # Embedding to run on CPU since it interferes with LLM in the GPU (resource-wise)
     )  # From nvidia, 8b embedding model
 
