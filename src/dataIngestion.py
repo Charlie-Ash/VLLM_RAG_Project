@@ -60,8 +60,8 @@ def build_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]:
 
     # Chunk documents
     splitter = SentenceSplitter(  # 和潤切片策略元件
-        chunk_size=128,
-        chunk_overlap=16
+        chunk_size=512,
+        chunk_overlap=64
     )
     chunks = splitter.get_nodes_from_documents(documents=documents)  # All PDF file content's chunks
 
@@ -120,8 +120,9 @@ def load_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]: 
 
     # Embedding model is stioll needed when loading existing DB. Still used in user query.
     embedding_model = HuggingFaceEmbedding(
-        model_name= "nvidia/llama-embed-nemotron-8b",
+        model_name= "BAAI/bge-m3",
         trust_remote_code=True
+        device="cpu"  # Embedding to run on CPU since it interferes with LLM in the GPU (resource-wise)
     )  # From nvidia, 8b embedding model
 
     # Persisting indexes
@@ -129,7 +130,6 @@ def load_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]: 
         vector_store= vector_store,
         storage_context= storage_context,
         embed_model= embedding_model,
-        device="cpu"  # Embedding to run on CPU since it interferes with LLM in the GPU (resource-wise)
     )
 
     # Clean-up (Delete embedding model & empty CUDA cache)

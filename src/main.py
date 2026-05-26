@@ -38,7 +38,7 @@ def main():
     # LLM
     print("Loading LLM...")
     llm = LLM(
-        model="google/gemma-4-E4B",
+        model="google/gemma-4-E4B",  # Gemma 4 E4B for RAG agent reasoning
         gpu_memory_utilization=0.8,  # reserve up to 80% of available VRAM for the KV cache and runtime buffers (tweak this if memory runs out when running)
         max_model_len=4096  # sets the maximum context window that vLLM will allocate KV cache for
     )  # Use this to install gemma4:26B quantized via Huggingface
@@ -67,15 +67,6 @@ def main():
 
         }]
 
-        # User's question prompt
-        user_prompt = {
-
-            "role": "user",
-            "content": input_text
-
-        }
-        prompts.append(user_prompt)
-
         # Retrieval relevant chunks
         relevant_info_list = user_query(index, input_text)
         for i in range(len(relevant_info_list)):
@@ -88,6 +79,14 @@ def main():
             }
             prompts.append(info_prompt)
 
+        # User's question prompt
+        user_prompt = {
+
+            "role": "user",
+            "content": input_text
+
+        }
+        prompts.append(user_prompt)
 
         # Feed structured prompt to LLM
         outputs = llm.chat(prompts, sampling_params)
