@@ -67,7 +67,7 @@ def build_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]:
 
     # Embed chunks
     embedding_model = HuggingFaceEmbedding(
-        model_name= "nvidia/llama-embed-nemotron-8b",
+        model_name= "BAAI/bge-m3",  # Multi-lingo embedding model
         trust_remote_code=True,
         device="cpu"  # Embedding to run on CPU since it interferes with LLM in the GPU (resource-wise)
     )  # From nvidia, 8b embedding model

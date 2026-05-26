@@ -38,7 +38,7 @@ def main():
     # LLM
     print("Loading LLM...")
     llm = LLM(
-        model="RedHatAI/gemma-4-26B-A4B-it-NVFP4",
+        model="google/gemma-4-E4B",
         gpu_memory_utilization=0.8,  # reserve up to 80% of available VRAM for the KV cache and runtime buffers (tweak this if memory runs out when running)
         max_model_len=4096  # sets the maximum context window that vLLM will allocate KV cache for
     )  # Use this to install gemma4:26B quantized via Huggingface
