@@ -60,36 +60,31 @@ def main():
 
         # Structured prompt (fed to vllm.chat()), OpenAI format
         sys_prompt = "You are a research assitant. Please use the relevant context passed in from the role 'system' to answer the users question. If the answer is unclear, reply the fact that you don't know."
-        prompts = [{
-
-            "role": "system",
-            "content": sys_prompt
-
-        }]
+        prompt = sys_prompt + "\n\n"
 
         # Retrieval relevant chunks
         relevant_info_list = user_query(index, input_text)
         for i in range(len(relevant_info_list)):
 
-            info_prompt = {
+            relevant_context = f"""
 
-                "role": "system",
-                "content": f"Relevant context {i}:\n{relevant_info_list[i]}"
+Relevant context {i}:
+{relevant_info_list[i]}
 
-            }
-            prompts.append(info_prompt)
+"""
+            prompt += relevant_context
 
         # User's question prompt
-        user_prompt = {
+        user_prompt = f"""
 
-            "role": "user",
-            "content": input_text
+User Query:
+{input_text}
 
-        }
-        prompts.append(user_prompt)
+"""
+        prompt += user_prompt
 
         # Feed structured prompt to LLM
-        outputs = llm.chat(prompts, sampling_params)
+        outputs = llm.generate([prompt], sampling_params)
 
         # Print out outputs
         for output in outputs:
