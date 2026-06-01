@@ -86,6 +86,8 @@ User Query:
         # Feed structured prompt to LLM
         outputs = llm.generate([prompt], sampling_params)
 
+        print("\n\nANSWER: \n\n")
+
         # Print out outputs
         for output in outputs:
             print(output.outputs[0].text)
