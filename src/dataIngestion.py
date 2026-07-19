@@ -15,8 +15,7 @@ import torch
 # Garbage collector
 import gc
 
-# Collection name
-COLLECTION_NAME = "my_docs"
+from config import COLLECTION_NAME, QDRANT_DB_PATH, EMBEDDING_MODEL
 
 
 def load_documents() -> list[Document]:  # Probably add a path argument here in the future for better modification
@@ -35,13 +34,17 @@ def load_documents() -> list[Document]:  # Probably add a path argument here in 
     for pdf_file in pdf_files:
 
         print(f"Loading: {pdf_file.name}")
-        pdf = pymupdf.open(pdf_file)
-        full_text = ""
+        try:
+            pdf = pymupdf.open(pdf_file)
+            full_text = ""
 
-        for page in pdf:
-            full_text += page.get_text()
+            for page in pdf:
+                full_text += page.get_text()
 
-        pdf.close()
+            pdf.close()
+        except Exception as e:
+            print(f"Skipping {pdf_file.name}: failed to parse ({e})")
+            continue
 
         # Create LlamaIndex Document object
         documents.append(
@@ -66,14 +69,17 @@ def build_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]:
     chunks = splitter.get_nodes_from_documents(documents=documents)  # All PDF file content's chunks
 
     # Embed chunks
-    embedding_model = HuggingFaceEmbedding(
-        model_name= "BAAI/bge-m3",  # Multi-lingo embedding model
-        trust_remote_code=True,
-        device="cpu"  # Embedding to run on CPU since it interferes with LLM in the GPU (resource-wise)
-    )  # From nvidia, 8b embedding model
-    
+    try:
+        embedding_model = HuggingFaceEmbedding(
+            model_name=EMBEDDING_MODEL,  # BAAI/bge-m3: multilingual embedding model, ~568M params
+            trust_remote_code=True,
+            device="cpu"  # Embedding to run on CPU since it interferes with LLM in the GPU (resource-wise)
+        )
+    except Exception as e:
+        raise RuntimeError(f"Failed to load embedding model '{EMBEDDING_MODEL}': {e}") from e
+
     # Setup Qdrant
-    db_client = qdrant_client.QdrantClient(path="./qdrant_db")  # DB client
+    db_client = qdrant_client.QdrantClient(path=QDRANT_DB_PATH)  # DB client
 
     if db_client.collection_exists(COLLECTION_NAME):  # Delete duplications of vector stores
         db_client.delete_collection(COLLECTION_NAME)
@@ -107,7 +113,7 @@ def build_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]:
 
 def load_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]:  # To load the index if the DB is already created 
 
-    db_client = qdrant_client.QdrantClient(path="./qdrant_db")  # DB client
+    db_client = qdrant_client.QdrantClient(path=QDRANT_DB_PATH)  # DB client
 
     vector_store = QdrantVectorStore(
         client= db_client,
@@ -119,11 +125,14 @@ def load_vector_index() -> tuple[VectorStoreIndex, qdrant_client.QdrantClient]: 
     )
 
     # Embedding model is stioll needed when loading existing DB. Still used in user query.
-    embedding_model = HuggingFaceEmbedding(
-        model_name= "BAAI/bge-m3",
-        trust_remote_code=True,
-        device="cpu"  # Embedding to run on CPU since it interferes with LLM in the GPU (resource-wise)
-    )  # From nvidia, 8b embedding model
+    try:
+        embedding_model = HuggingFaceEmbedding(
+            model_name=EMBEDDING_MODEL,
+            trust_remote_code=True,
+            device="cpu"  # Embedding to run on CPU since it interferes with LLM in the GPU (resource-wise)
+        )
+    except Exception as e:
+        raise RuntimeError(f"Failed to load embedding model '{EMBEDDING_MODEL}': {e}") from e
 
     # Persisting indexes
     index = VectorStoreIndex.from_vector_store(  # 和潤向量索引元件

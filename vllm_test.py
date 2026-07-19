@@ -5,10 +5,14 @@ RUN THIS ON LINUX SYSTEM
 from vllm import LLM, SamplingParams
 
 # Initialize the engine
-llm = LLM(model="RedHatAI/gemma-4-26B-A4B-it-NVFP4",
-          gpu_memory_utilization=0.9,  # reserve up to 90% of available VRAM for the KV cache and runtime buffers
-          max_model_len=32768  # sets the maximum context window that vLLM will allocate KV cache for
-          )  # Use this to install gemma4:26B quantized via Huggingface
+# Same model as src/main.py (google/gemma-4-E2B-it-qat-w4a16-ct): official Google
+# QAT-quantized checkpoint, ~7.3 GiB VRAM, small enough to coexist with the A2A
+# orchestrator's E4B-it model on one GPU.
+llm = LLM(model="google/gemma-4-E2B-it-qat-w4a16-ct",
+          trust_remote_code=True,  # required for Gemma 4's custom architecture code
+          gpu_memory_utilization=0.5,
+          max_model_len=4096
+          )
 
 # Define sampling parameters
 sampling_params = SamplingParams(temperature=0.65,  # temperture: randomness
