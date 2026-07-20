@@ -70,7 +70,7 @@ def main():
 
         print("Loading completed.")
 
-    # LLM
+    # LLM loading, checks if CUDA memory is sufficient
     print("Loading LLM...")
     check_gpu_memory(GPU_MEMORY_UTILIZATION)
 
