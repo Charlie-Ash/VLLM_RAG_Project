@@ -1,9 +1,4 @@
-"""Shared constants for the RAG pipeline.
-
-Centralized here so main.py, dataIngestion.py, and userQuery.py can't drift
-out of sync (previously COLLECTION_NAME and the Qdrant path were duplicated
-independently in multiple files).
-"""
+# Shared constants for the RAG pipeline.
 
 import os
 from pathlib import Path
